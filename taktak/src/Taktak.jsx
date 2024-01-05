@@ -38,11 +38,11 @@ const TakTakGame = () => {
   };
 
   return (
-    <div className='w-full h-full'>
-      <div className="status">{getStatus()}</div>
+    <div className='w-full h-full bg-black'>
+      <div className="status text-white">{getStatus()}</div>
       <div className="board h-5/6">
         {board.map((row, rowIndex) => (
-            <div key={rowIndex} className="flex h-1/6 gap-4">
+            <div key={rowIndex} className="flex h-1/6 gap-4 text-white">
             {row.map((square, colIndex) => (
                 <div key={colIndex} className='border basis-2/12'>{rowIndex}</div>
             ))}
