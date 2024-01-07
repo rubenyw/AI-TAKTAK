@@ -222,7 +222,7 @@ const TaktakWithPlayer = () => {
         <div className="text-lg mb-4">Player 2</div>
         <div className="text-lg mb-4">Score</div>
         <div className="flex items-center gap-4 mb-4">
-          <div className={`w-24 h-24 ${players[2].stonesClicked? "bg-slate-400" : "bg-black"} hover:bg-slate-400`}
+          <div className={`w-24 h-24 ${players[2].stonesClicked? "bg-slate-200" : "bg-black"} hover:bg-stone-200`}
             onClick={()=>{PlayerClickStonesDeck(2, "stone")}}
           >
 
@@ -230,7 +230,7 @@ const TaktakWithPlayer = () => {
           <div className="text-md">Stone : {players[2].stones}</div>
         </div>
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-24 h-24 bg-black rounded-full"
+          <div className={`w-24 h-24 ${players[1].capstoneClicked? "bg-slate-200" : "bg-black"} hover:bg-stone-200 rounded-full`}
             onClick={()=>{PlayerClickStonesDeck(2, "cap")}}
           >
 
@@ -359,7 +359,7 @@ const TaktakWithPlayer = () => {
           }
         </div>
         <button onClick={reset}>reset</button>
-        <button onClick={()=>{setPreviewMode(!previewMode)}}>Preview</button>
+        <button className={`rounded-lg ms-5 p-1 ${previewMode? "bg-orange-600" : "bg-indigo-500"} hover:bg-slate-400 rounded-full`} onClick={()=>{setPreviewMode(!previewMode)}}>Preview</button>
       </div>
       <div className="text-lg text-white">Player Turn : {playerTurn}</div>
       <Table/>  
