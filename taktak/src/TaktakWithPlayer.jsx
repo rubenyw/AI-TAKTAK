@@ -42,16 +42,21 @@ const TaktakWithPlayer = () => {
 
   const handleClick = (rowIndex, colIndex) => {
     const currentPlayer = players[playerTurn];
+    const columnBoard = board[rowIndex][colIndex];
     if(previewMode){
-      setPreviewBoard(board[rowIndex][colIndex]?board[rowIndex][colIndex] :[]);
-    }
-    else if(!currentPlayer.capstoneClicked && !currentPlayer.stonesClicked){
-      setPreviewMode(board[rowIndex][colIndex]? board[rowIndex][colIndex]: []);
-    }else{
+      setPreviewBoard(columnBoard?columnBoard : []);
+    }else if(pickUpMode){
+      console.log();
+    }else if(currentPlayer.capstoneClicked || currentPlayer.stonesClicked){
       const stoneType = players[playerTurn].capstoneClicked? "capstone" : (stoneMode? "standing" : "flatstone");
       placeStone(rowIndex, colIndex, stoneType);
       nextTurn();
-
+    }else{
+      if(!columnBoard) return;
+      if(columnBoard[columnBoard.length - 1]){
+        pickUpColumn(rowIndex, colIndex);
+      }
+      setPickUpMode(true);
     }
   }
 
@@ -65,6 +70,75 @@ const TaktakWithPlayer = () => {
     console.log(temp[row][col]);
     setBoard(temp);
   }
+
+  const pickUpColumn = (row, col) => {
+    let stones = board[row][col];
+    let topStone = stones[stones.length - 1];
+    if(topStone.player != playerTurn) return;
+
+    setHand(stones.splice(-Math.min(5, stones.length)));
+    setPickUpMode(true);
+    setLastPickUpPosition({row, col});
+    setPickUpDirection(null);
+  }
+
+  const placeFromHand = (row, col) => {
+    if (pickUpMode && hand.length > 0) {
+      let isValidMove;
+      if (pickUpDirection === null) {
+        // First move: can place in the same position or any adjacent space
+        let dx = col - lastPickUpPosition.col;
+        let dy = row - lastPickUpPosition.row;
+        isValidMove =
+          (dx === 0 && dy === 0) ||
+          (Math.abs(dx) === 1 && dy === 0) ||
+          (dx === 0 && Math.abs(dy) === 1);
+  
+        if (isValidMove && (dx !== 0 || dy !== 0)) {
+          setPickUpDirection({ dy, dx });
+        }
+      } else {
+        // Subsequent moves: must follow the previously set direction
+        isValidMove = col === lastPickUpPosition.col + pickUpDirection.dx && row === lastPickUpPosition.row + pickUpDirection.dy;
+      }
+  
+      if (isValidMove) {
+        let topStone = board[row][col] ? board[row][col][board[row][col].length - 1] : null;
+        if (topStone && (topStone.type === "standing" || topStone.type === "capstone")) {
+          console.log("Cannot place on top of a standing stone or capstone.");
+          return;
+        }
+  
+        let stone = hand.shift(); // Remove the first stone from the hand
+        if (!board[row][col]) {
+          setBoard((prevBoard) => {
+            const newBoard = [...prevBoard];
+            newBoard[row] = [...newBoard[row]];
+            newBoard[row][col] = [stone];
+            return newBoard;
+          });
+        } else {
+          setBoard((prevBoard) => {
+            const newBoard = [...prevBoard];
+            newBoard[row] = [...newBoard[row]];
+            newBoard[row][col].push(stone);
+            return newBoard;
+          });
+        }
+  
+        setLastPickUpPosition({ row, col }); // Update the last position
+        if (hand.length === 0) {
+          setPickUpMode(false); // Turn pick up mode off if the hand is empty
+          // You can call your next turn function here if needed
+        }
+      } else {
+        console.log("Invalid move. You must place in the same position or one space in the chosen direction.");
+      }
+    } else {
+      console.log("Not in pick up mode or no stones in hand.");
+    }
+  };
+  
 
   const nextTurn = () => {
 
