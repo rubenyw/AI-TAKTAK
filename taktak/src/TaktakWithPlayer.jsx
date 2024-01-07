@@ -85,11 +85,11 @@ const TaktakWithPlayer = () => {
 
   const LeftsideNumber = ()=>{
     return (
-      <div className="flex flex-col items-end text-white">
-        <div className="grid place-content-center h-10 w-24">&nbsp;</div>
+      <div className="flex flex-col items-end text-white ">
+        <div className="grid place-content-center h-10 w-24 ">&nbsp;</div>
           {
             numberic.map((item, index) => {
-              return <div key={index} className="grid place-content-center h-24 w-10 border">{item}</div>
+              return <div key={index} className="grid place-content-center h-24 w-10 border bg-yellow-600">{item}</div>
             })
           }
       </div>
@@ -103,7 +103,7 @@ const TaktakWithPlayer = () => {
 
   const PlayerOneDeck = ()=> {
     return (
-      <div className="flex flex-col border basis-1/3 bg-black text-white px-4">
+      <div className="flex flex-col border basis-1/3 bg-gradient-to-r from-zinc-900 via-neutral-800 to-stone-700  text-white px-4">
         <div className="text-lg mb-4">Player 1</div>
         <div className="flex items-center gap-4 mb-4">
           <div className="w-24 h-24 bg-white">
@@ -123,7 +123,7 @@ const TaktakWithPlayer = () => {
 
   const PlayerTwoDeck = ()=> {
     return (
-      <div className="flex flex-col border basis-1/3 bg-white text-black px-4">
+      <div className="flex flex-col border basis-1/3 bg-gradient-to-r from-zinc-400 via-neutral-500 to-stone-600 text-black px-4">
         <div className="text-lg mb-4">Player 2</div>
         <div className="flex items-center gap-4 mb-4">
           <div className="w-24 h-24 bg-black">
@@ -144,14 +144,14 @@ const TaktakWithPlayer = () => {
 
   const Table = () => {
     return (
-      <div className="board flex border justify-between w-full p-4">
+      <div className="board flex border justify-between w-full p-4 bg-gradient-to-r from-gray-600 via-zinc-500 to-neutral-400">
         <PlayerOneDeck/>
         <div className="flex flex-row basis-1/3">
           <LeftsideNumber/>
           <div className="flex flex-col">
             <div className="flex">
               {alphabet.map((item, index) => (
-                  <div key={index} className="flex text-white">
+                  <div key={index} className="flex text-white bg-yellow-600">
                     <div className='grid place-content-center border h-10 w-24'>{item}</div>
                   </div>
               ))}
@@ -161,17 +161,17 @@ const TaktakWithPlayer = () => {
             </div>
             <div className="flex">
               {alphabet.map((item, index) => (
-                  <div key={index} className="flex text-white">
+                  <div key={index} className="flex text-white bg-yellow-600">
                     <div className='grid place-content-center border h-10 w-24'>{item}</div>
                   </div>
               ))}
             </div>
           </div>
-          <div className="flex flex-col items-start text-white">
-            <div className="grid place-content-center h-10 w-24">&nbsp;</div>
+          <div className="flex flex-col items-start text-white ">
+            <div className="grid place-content-center h-10 w-24 ">&nbsp;</div>
             {
               numberic.map((item, index) => {
-                return <div key={index} className="grid place-content-center h-24 w-10 border">{item}</div>
+                return <div key={index} className="grid place-content-center h-24 w-10 border bg-yellow-600">{item}</div>
               })
             }
           </div>
