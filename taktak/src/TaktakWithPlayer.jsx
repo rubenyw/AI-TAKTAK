@@ -39,64 +39,47 @@ const TaktakWithPlayer = () => {
 
   const handleClick = (rowIndex, colIndex) => {
     if (!board[rowIndex][colIndex]) {
-      setBoard((prevBoard) => {
-        const newBoard = prevBoard.map((row) => [...row]);
-        newBoard[rowIndex][colIndex] = { player: playerTurn, type: stoneMode? "standing" : "flatstone" };
-        setPlayerTurn(playerTurn === 1 ? 2 : 1);
-        return newBoard;
-      });
+      if(!players[playerTurn].capstoneClicked && !players[playerTurn].stonesClicked){
+        console.log();
+      }else{
+        const stoneType = players[playerTurn].capstoneClicked? "capstone" : (stoneMode? "standing" : "flatstone");
+        placeStone(rowIndex, colIndex, stoneType);
+        nextTurn();
+
+      }
     }
   }
 
-  const calculateWinner = (currentBoard) => {
-    // Add your logic to check for a winner
-    // Return 'X' or 'O' if there's a winner, or null if no winner yet
-  };
-
-  const PrintBoard = () => {
-    return (
-      board.map((row, rowIndex) => (
-        <div key={rowIndex} className="flex text-white">
-          {row.map((square, colIndex) => (
-              <div key={colIndex} className='grid place-content-center bg-yellow-700 hover:bg-yellow-200 border h-24 w-24'
-                onClick={()=>{
-                  handleClick(rowIndex, colIndex);
-                }}
-              >
-                {
-                  square &&
-                  square.type == "flatstone" &&
-                  <Flatstone playerTurn={square.player}/>
-                }
-                {
-                  square &&
-                  square.type == "standing" &&
-                  <Standstone playerTurn={square.player}/>
-                }
-                {
-                  square &&
-                  square.type == "capstone" &&
-                  <Capstone playerTurn={square.player}/>
-                }
-              </div>
-          ))}
-        </div>
-      ))
-    )
+  const placeStone = (row, col, stone) => {
+    setBoard((prevBoard) => {
+      const newBoard = prevBoard.map((row) => [...row]);
+      if(!newBoard[row][col]){
+        newBoard[row][col] = [{ player: playerTurn, type: stone }];
+      }else{
+        newBoard[row][col].push({ player: playerTurn, type: stone });
+      }
+      console.log(newBoard[row][col]);
+      return newBoard;
+    });
   }
 
-  const LeftsideNumber = ()=>{
-    return (
-      <div className="flex flex-col items-end text-white ">
-        <div className="grid place-content-center h-10 w-24 ">&nbsp;</div>
-          {
-            numberic.map((item, index) => {
-              return <div key={index} className="grid place-content-center h-24 w-10 border bg-yellow-600">{item}</div>
-            })
-          }
-      </div>
-    )
+  const nextTurn = () => {
+
+    setPlayers((prevPlayers) => {
+      const updatedPlayers = {
+        ...prevPlayers,
+        [playerTurn]: {
+          ...prevPlayers[playerTurn],
+          stonesClicked: false,
+          capstoneClicked: false,
+        },
+      };
+      return updatedPlayers;
+    });
+
+    setPlayerTurn(playerTurn === 1 ? 2 : 1);
   }
+  
 
   const PlayerClickStonesDeck = (turn, type) => {
     if (playerTurn !== turn) {
@@ -134,8 +117,53 @@ const TaktakWithPlayer = () => {
       }
     });
   };
-  
-  
+
+  const PrintBoard = () => {
+    return (
+      board.map((row, rowIndex) => (
+        <div key={rowIndex} className="flex text-white">
+          {row.map((square, colIndex) => {
+            return (
+              <div key={colIndex} className='grid place-content-center bg-yellow-700 hover:bg-yellow-200 border h-24 w-24'
+                onClick={()=>{
+                  handleClick(rowIndex, colIndex);
+                }}
+              >
+                {
+                  square &&
+                  square[square.length - 1].type == "flatstone" &&
+                  <Flatstone playerTurn={square[square.length - 1].player}/>
+                }
+                {
+                  square &&
+                  square[square.length - 1].type == "standing" &&
+                  <Standstone playerTurn={square[square.length - 1].player}/>
+                }
+                {
+                  square &&
+                  square[square.length - 1].type == "capstone" &&
+                  <Capstone playerTurn={square[square.length - 1].player}/>
+                }
+              </div>
+          )
+          })}
+        </div>
+      ))
+    )
+  }
+
+  const LeftsideNumber = ()=>{
+    return (
+      <div className="flex flex-col items-end text-white ">
+        <div className="grid place-content-center h-10 w-24 ">&nbsp;</div>
+          {
+            numberic.map((item, index) => {
+              return <div key={index} className="grid place-content-center h-24 w-10 border bg-yellow-600">{item}</div>
+            })
+          }
+      </div>
+    )
+  }
 
   const PlayerOneDeck = ()=> {
     return (
@@ -144,7 +172,7 @@ const TaktakWithPlayer = () => {
         <div className="text-lg mb-4">Score</div>
           <div className="flex items-center gap-4 mb-4">
             <div className={`w-24 h-24 ${players[1].stonesClicked? "bg-slate-400" : "bg-white"} hover:bg-slate-400`}
-              onClick={()=>{PlayerClickStonesDeck(playerTurn, "stone")}}
+              onClick={()=>{PlayerClickStonesDeck(1, "stone")}}
             >
 
             </div>
@@ -152,7 +180,7 @@ const TaktakWithPlayer = () => {
           </div>
         <div className="flex items-center gap-4 mb-4">
           <div className={`w-24 h-24 ${players[1].capstoneClicked? "bg-slate-400" : "bg-white"} hover:bg-slate-400 rounded-full`}
-            onClick={()=>{PlayerClickStonesDeck(playerTurn, "cap")}}
+            onClick={()=>{PlayerClickStonesDeck(1, "cap")}}
           >
 
           </div>
@@ -190,13 +218,17 @@ const TaktakWithPlayer = () => {
         <div className="text-lg mb-4">Player 2</div>
         <div className="text-lg mb-4">Score</div>
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-24 h-24 bg-black">
+          <div className="w-24 h-24 bg-black"
+            onClick={()=>{PlayerClickStonesDeck(2, "stone")}}
+          >
 
           </div>
           <div className="text-md">Stone : {players[2].stones}</div>
         </div>
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-24 h-24 bg-black rounded-full">
+          <div className="w-24 h-24 bg-black rounded-full"
+            onClick={()=>{PlayerClickStonesDeck(2, "cap")}}
+          >
 
           </div>
           <div className="text-md">Stone : {players[2].capstones}</div>
@@ -204,7 +236,6 @@ const TaktakWithPlayer = () => {
       </div>
     )
   }
-
 
   const Table = () => {
     return (
@@ -256,7 +287,9 @@ const TaktakWithPlayer = () => {
       <div className={`${playerTurn == 1? "bg-white" : "bg-black"} h-16 w-8`}></div>
     )
   }
-  const Capstone = ({playerTurn})=> {}
+  const Capstone = ({playerTurn})=> {
+    return <div className={`${playerTurn == 1? "bg-white" : "bg-black"} h-8 w-8 rounded-full`}></div>
+  }
 
   return (
     <div className='w-full h-full bg-black flex flex-col justify-center'>
