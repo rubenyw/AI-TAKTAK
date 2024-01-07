@@ -4,7 +4,9 @@ import TaktakWithPlayer from './TaktakWithPlayer'
 
 function App() {
   return (
-    <TaktakWithPlayer/>
+    <div className="w-full h-full">
+      <TaktakWithPlayer/>
+    </div>
   )
 }
 

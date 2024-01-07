@@ -9,8 +9,8 @@ const TaktakWithPlayer = () => {
 
   const [playerTurn, setPlayerTurn] = useState(1); // 1 playerOne , 2 Player Two
   const [players, setPlayers] = useState({
-    1: { stones: 21, capstones: 1 },
-    2: { stones: 21, capstones: 1 },
+    1: { stones: 21, capstones: 1, stonesClicked: false, capstoneClicked: false },
+    2: { stones: 21, capstones: 1, stonesClicked: false, capstoneClicked: false },
   })
 
   const [actionMode, setActionMode] = useState(false);
@@ -96,23 +96,61 @@ const TaktakWithPlayer = () => {
     )
   }
 
-  const PlayerOneClickDeck = () => {
-    if(playerTurn != 1) return;
+  const PlayerClickStonesDeck = (turn, type) => {
+    if (playerTurn !== turn) {
+      return;
+    }
     
-  }
+    if( (type == "stone" && players[turn].stones == 0 && !players[turn].stonesClicked) ||
+        (type == "cap" && players[turn].capstones == 0 && !players[turn].capstoneClicked))return;
+
+    setPlayers((prevPlayers) => {
+      if (type === "stone") {
+        const updatedPlayers = {
+          ...prevPlayers,
+          [turn]: {
+            ...prevPlayers[turn],
+            stones: prevPlayers[turn].stonesClicked
+              ? prevPlayers[turn].stones + 1
+              : prevPlayers[turn].stones - 1,
+            stonesClicked: !prevPlayers[turn].stonesClicked,
+          },
+        };
+        return updatedPlayers;
+      } else {
+        const updatedPlayers = {
+          ...prevPlayers,
+          [turn]: {
+            ...prevPlayers[turn],
+            capstones: prevPlayers[turn].capstoneClicked
+              ? prevPlayers[turn].capstones + 1
+              : prevPlayers[turn].capstones - 1,
+            capstoneClicked: !prevPlayers[turn].capstoneClicked,
+          },
+        };
+        return updatedPlayers;
+      }
+    });
+  };
+  
+  
 
   const PlayerOneDeck = ()=> {
     return (
       <div className="flex flex-col border basis-1/3 bg-black text-white px-4">
         <div className="text-lg mb-4">Player 1</div>
-        <div className="flex items-center gap-4 mb-4">
-          <div className="w-24 h-24 bg-white">
+          <div className="flex items-center gap-4 mb-4">
+            <div className={`w-24 h-24 ${players[1].stonesClicked? "bg-slate-200" : "bg-white"} hover:bg-slate-200`}
+              onClick={()=>{PlayerClickStonesDeck(playerTurn, "stone")}}
+            >
 
+            </div>
+            <div className="text-md">Stone : {players[1].stones}</div>
           </div>
-          <div className="text-md">Stone : {players[1].stones}</div>
-        </div>
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-24 h-24 bg-white rounded-full">
+          <div className={`w-24 h-24 ${players[1].capstoneClicked? "bg-slate-200" : "bg-white"} rounded-full`}
+            onClick={()=>{PlayerClickStonesDeck(playerTurn, "cap")}}
+          >
 
           </div>
           <div className="text-md">Stone : {players[1].capstones}</div>
@@ -196,6 +234,9 @@ const TaktakWithPlayer = () => {
 
   return (
     <div className='w-full h-full bg-black flex flex-col justify-center'>
+      <div className="text-lg text-white self-center">
+        <button onClick={reset}>reset</button>
+      </div>
       <div className="text-lg text-white">Player Turn : {playerTurn}</div>
       <Table/>  
     </div>
