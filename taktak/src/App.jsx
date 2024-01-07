@@ -1,10 +1,10 @@
 /* eslint-disable no-unused-vars */
 import { useState } from 'react'
-import TakTakGame from './Taktak'
+import TaktakWithPlayer from './TaktakWithPlayer'
 
 function App() {
   return (
-    <TakTakGame/>
+    <TaktakWithPlayer/>
   )
 }
 
