@@ -6,7 +6,6 @@ const TaktakWithPlayer = () => {
   const [board, setBoard] = useState(() => Array.from({ length: 5 }, () => Array(5).fill(null)));
   const [alphabet, setAlphabet] = useState(["A", "B", "C", "D", "E"]);
   const [numberic, setNumeric] = useState([1, 2, 3, 4, 5]);
-  const [isXNext, setIsXNext] = useState(true);
 
   const [playerTurn, setPlayerTurn] = useState(1); // 1 playerOne , 2 Player Two
   const [players, setPlayers] = useState({
@@ -17,8 +16,24 @@ const TaktakWithPlayer = () => {
   const [actionMode, setActionMode] = useState(false);
   const [hand, setHand] = useState([]);
   const [pickUpMode, setPickUpMode] = useState(false);
-  const lastPickUpPosition = null;
-  const pickUpDirection = null;
+  const [lastPickUpPosition, setLastPickUpPosition] = useState(null);
+  const [pickUpDirection, setPickUpDirection] = useState(null);
+
+  const reset = () => {
+    setBoard(() => Array.from({ length: 5 }, () => Array(5).fill(null)));
+    setPlayerTurn(1);
+    setPlayers(
+      {
+        1: { stones: 21, capstones: 1 },
+        2: { stones: 21, capstones: 1 },
+      }
+    );
+    setActionMode(false);
+    setHand([]);
+    setPickUpMode(false);
+    setLastPickUpPosition(null);
+    setPickUpDirection(null);
+  }
 
   const handleClick = (rowIndex, colIndex) => {
     if (!board[rowIndex][colIndex]) {
@@ -34,15 +49,6 @@ const TaktakWithPlayer = () => {
   const calculateWinner = (currentBoard) => {
     // Add your logic to check for a winner
     // Return 'X' or 'O' if there's a winner, or null if no winner yet
-  };
-
-  const getStatus = () => {
-    const winner = calculateWinner(board);
-    if (winner) {
-      return `Winner: ${winner}`;
-    } else {
-      return `Next player: ${isXNext ? 'X' : 'O'}`;
-    }
   };
 
   const PrintBoard = () => {
@@ -90,10 +96,56 @@ const TaktakWithPlayer = () => {
     )
   }
 
+  const PlayerOneClickDeck = () => {
+    if(playerTurn != 1) return;
+    
+  }
+
+  const PlayerOneDeck = ()=> {
+    return (
+      <div className="flex flex-col border basis-1/3 bg-black text-white px-4">
+        <div className="text-lg mb-4">Player 1</div>
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-24 h-24 bg-white">
+
+          </div>
+          <div className="text-md">Stone : {players[1].stones}</div>
+        </div>
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-24 h-24 bg-white rounded-full">
+
+          </div>
+          <div className="text-md">Stone : {players[1].capstones}</div>
+        </div>
+      </div>
+    )
+  }
+
+  const PlayerTwoDeck = ()=> {
+    return (
+      <div className="flex flex-col border basis-1/3 bg-white text-black px-4">
+        <div className="text-lg mb-4">Player 2</div>
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-24 h-24 bg-black">
+
+          </div>
+          <div className="text-md">Stone : {players[2].stones}</div>
+        </div>
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-24 h-24 bg-black rounded-full">
+
+          </div>
+          <div className="text-md">Stone : {players[2].capstones}</div>
+        </div>
+      </div>
+    )
+  }
+
+
   const Table = () => {
     return (
       <div className="board flex border justify-between w-full p-4">
-        <div className="flex border basis-1/3 bg-white">ha</div>
+        <PlayerOneDeck/>
         <div className="flex flex-row basis-1/3">
           <LeftsideNumber/>
           <div className="flex flex-col">
@@ -124,7 +176,7 @@ const TaktakWithPlayer = () => {
             }
           </div>
         </div>
-        <div className="flex basis-1/3 bg-white">ha</div>
+        <PlayerTwoDeck></PlayerTwoDeck>
       </div>
     )
   }
