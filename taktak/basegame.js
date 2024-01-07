@@ -149,8 +149,24 @@ class Board {
 
     placeFromHand(x, y) {
         if (this.pickUpMode && this.hand.length > 0) {
-            let isValidMove = (this.pickUpDirection === null && x === this.lastPickUpPosition.x && y === this.lastPickUpPosition.y) || (this.pickUpDirection && x === this.lastPickUpPosition.x + this.pickUpDirection.dx && y === this.lastPickUpPosition.y + this.pickUpDirection.dy);
+            let isValidMove;
+            if (this.pickUpDirection === null) {
+                // First move: can place in the same position or any adjacent space
+                let dx = x - this.lastPickUpPosition.x;
+                let dy = y - this.lastPickUpPosition.y;
+                isValidMove =
+                    (dx === 0 && dy === 0) || // Same position
+                    (Math.abs(dx) === 1 && dy === 0) || // Adjacent horizontally
+                    (dx === 0 && Math.abs(dy) === 1); // Adjacent vertically
 
+                // Set the direction if the stone is placed in a new position
+                if (isValidMove && (dx !== 0 || dy !== 0)) {
+                    this.pickUpDirection = { dx, dy };
+                }
+            } else {
+                // Subsequent moves: must follow the previously set direction
+                isValidMove = x === this.lastPickUpPosition.x + this.pickUpDirection.dx && y === this.lastPickUpPosition.y + this.pickUpDirection.dy;
+            }
             if (isValidMove) {
                 let topStone = this.grid[y][x] ? this.grid[y][x][this.grid[y][x].length - 1] : null;
                 if (topStone && (topStone.isStanding() || topStone.isCapstone())) {
@@ -177,7 +193,7 @@ class Board {
         }
     }
 
-    click(x, y) {
+    click(x, y, type) {
         if (!this.actionMode) {
             // Action mode is off, simply show the column contents
             console.log(this.seeColumn(x, y));
@@ -185,24 +201,29 @@ class Board {
             // If in pick up mode, try to place a stone from the hand
             this.placeFromHand(x, y);
         } else {
-            // Action mode is on, perform actions based on the column state
+            // Action mode is on, perform actions based on the column state and type
             let column = this.grid[y][x];
             if (column && column.length > 0 && column[column.length - 1].player === this.currentPlayer) {
                 // The top stone belongs to the current player, pick up the column
                 this.pickUpColumn(x, y);
             } else if (!column || column.length === 0) {
-                // The column is empty, place a stone
-                if (this.players[this.currentPlayer].stones > 0) {
-                    this.placeStone(x, y, new Stone(this.currentPlayer, "flat")); // Place a flat stone as an example
+                // The column is empty, place a stone of the specified type
+                if (type === "f" && this.players[this.currentPlayer].stones > 0) {
+                    this.placeStone(x, y, new Stone(this.currentPlayer, "flat"));
                     this.players[this.currentPlayer].stones -= 1;
-                    this.nextTurn();
+                } else if (type === "s" && this.players[this.currentPlayer].stones > 0) {
+                    this.placeStone(x, y, new Stone(this.currentPlayer, "standing"));
+                    this.players[this.currentPlayer].stones -= 1;
+                } else if (type === "c" && this.players[this.currentPlayer].capstones > 0) {
+                    this.placeStone(x, y, new Stone(this.currentPlayer, "capstone"));
+                    this.players[this.currentPlayer].capstones -= 1;
                 } else {
-                    console.log("No more stones left to place.");
+                    console.log("Invalid type or no stones/capstones left.");
                 }
+                this.nextTurn();
             } else {
                 // The top stone belongs to the other player, invalid move
                 console.log("Invalid move. The top stone belongs to the other player.");
-                // Do not switch turns or disable action mode
             }
         }
     }
@@ -248,14 +269,23 @@ function startGame(board) {
         const playerInfo = board.players[board.currentPlayer];
         console.log(`Player ${board.currentPlayer}'s move. Stones: ${playerInfo.stones}, Capstones: ${playerInfo.capstones}`);
 
-        let input = prompt("Enter your move (x,y) or -1 to toggle action mode:");
-        if (input !== null) {
-            // Check if the user hasn't cancelled the prompt
-            board.executeCommand(input);
-            promptNextAction(); // Prompt for the next action after the current one is executed
+        let input = prompt("Enter your move (x,y,type) or -1 to toggle action mode:");
+        if (input === "-1") {
+            board.toggleActionMode();
         } else {
-            console.log("Game ended by user.");
+            const parts = input.split(",");
+            const x = parseInt(parts[0], 10);
+            const y = parseInt(parts[1], 10);
+            const type = parts[2]; // 'f' for flat, 's' for standing, 'c' for capstone
+
+            if (!isNaN(x) && !isNaN(y) && ["f", "s", "c"].includes(type)) {
+                board.click(x, y, type);
+            } else {
+                console.log("Invalid input. Please enter coordinates as x,y,type where type is 'f', 's', or 'c'.");
+            }
         }
+        board.printBoard(); // Print the board after each action
+        promptNextAction(); // Prompt for the next action after the current one is executed
     }
 
     promptNextAction(); // Start the first prompt

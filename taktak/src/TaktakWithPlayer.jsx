@@ -1,23 +1,35 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import { useState } from 'react';
 
 const TaktakWithPlayer = () => {
-  const [board, setBoard] = useState(Array(5).fill(Array(5).fill(1)));
+  const [board, setBoard] = useState(() => Array.from({ length: 5 }, () => Array(5).fill(null)));
   const [alphabet, setAlphabet] = useState(["A", "B", "C", "D", "E"]);
   const [numberic, setNumeric] = useState([1, 2, 3, 4, 5]);
   const [isXNext, setIsXNext] = useState(true);
 
-  const handleClick = (row, col) => {
-    if (board[row][col] || calculateWinner(board)) {
-      return;
+  const [playerTurn, setPlayerTurn] = useState(1); // 1 playerOne , 2 Player Two
+  const [players, setPlayers] = useState({
+    1: { stones: 21, capstones: 1 },
+    2: { stones: 21, capstones: 1 },
+  })
+
+  const [actionMode, setActionMode] = useState(false);
+  const [hand, setHand] = useState([]);
+  const [pickUpMode, setPickUpMode] = useState(false);
+  const lastPickUpPosition = null;
+  const pickUpDirection = null;
+
+  const handleClick = (rowIndex, colIndex) => {
+    if (!board[rowIndex][colIndex]) {
+      setBoard((prevBoard) => {
+        const newBoard = prevBoard.map((row) => [...row]);
+        newBoard[rowIndex][colIndex] = { player: playerTurn, type: "standing" };
+        setPlayerTurn(playerTurn === 1 ? 2 : 1);
+        return newBoard;
+      });
     }
-
-    const newBoard = board.map(row => [...row]);
-    newBoard[row][col] = isXNext ? 'X' : 'O';
-
-    setBoard(newBoard);
-    setIsXNext(!isXNext);
-  };
+  }
 
   const calculateWinner = (currentBoard) => {
     // Add your logic to check for a winner
@@ -33,18 +45,57 @@ const TaktakWithPlayer = () => {
     }
   };
 
+  const PrintBoard = () => {
+    return (
+      board.map((row, rowIndex) => (
+        <div key={rowIndex} className="flex text-white">
+          {row.map((square, colIndex) => (
+              <div key={colIndex} className='grid place-content-center bg-yellow-700 hover:bg-yellow-200 border h-24 w-24'
+                onClick={()=>{
+                  handleClick(rowIndex, colIndex);
+                }}
+              >
+                {
+                  square &&
+                  square.type == "flatstone" &&
+                  <Flatstone playerTurn={square.player}/>
+                }
+                {
+                  square &&
+                  square.type == "standing" &&
+                  <Standstone playerTurn={square.player}/>
+                }
+                {
+                  square &&
+                  square.type == "capstone" &&
+                  <Capstone playerTurn={square.player}/>
+                }
+              </div>
+          ))}
+        </div>
+      ))
+    )
+  }
+
+  const LeftsideNumber = ()=>{
+    return (
+      <div className="flex flex-col items-end text-white">
+        <div className="grid place-content-center h-10 w-24">&nbsp;</div>
+          {
+            numberic.map((item, index) => {
+              return <div key={index} className="grid place-content-center h-24 w-10 border">{item}</div>
+            })
+          }
+      </div>
+    )
+  }
+
   const Table = () => {
     return (
-      <div className="board border w-full p-4">
-        <div className="flex flex-row">
-          <div className="flex flex-col items-end text-white">
-            <div className="grid place-content-center h-10 w-24">&nbsp;</div>
-            {
-              numberic.map((item, index) => {
-                return <div key={index} className="grid place-content-center h-24 w-10 border">{item}</div>
-              })
-            }
-          </div>
+      <div className="board flex border justify-between w-full p-4">
+        <div className="flex border basis-1/3 bg-white">ha</div>
+        <div className="flex flex-row basis-1/3">
+          <LeftsideNumber/>
           <div className="flex flex-col">
             <div className="flex">
               {alphabet.map((item, index) => (
@@ -54,13 +105,7 @@ const TaktakWithPlayer = () => {
               ))}
             </div>
             <div className="flex flex-col">
-              {board.map((row, rowIndex) => (
-                  <div key={rowIndex} className="flex text-white">
-                  {row.map((square, colIndex) => (
-                      <div key={colIndex} className='grid place-content-center bg-yellow-700 hover:bg-yellow-200 border h-24 w-24'>{rowIndex}</div>
-                  ))}
-                  </div>
-              ))}
+              <PrintBoard/>
             </div>
             <div className="flex">
               {alphabet.map((item, index) => (
@@ -79,12 +124,27 @@ const TaktakWithPlayer = () => {
             }
           </div>
         </div>
+        <div className="flex basis-1/3 bg-white">ha</div>
       </div>
     )
   }
 
+  const Flatstone = ({playerTurn}) => {
+    return (
+      <div className={`${playerTurn == 1? "bg-white" : "bg-black"} h-16 w-16`}></div>
+    )
+  }
+
+  const Standstone = ({playerTurn})=> {
+    return (
+      <div className={`${playerTurn == 1? "bg-white" : "bg-black"} h-16 w-8`}></div>
+    )
+  }
+  const Capstone = ({playerTurn})=> {}
+
   return (
-    <div className='w-full h-full bg-black flex justify-center'>
+    <div className='w-full h-full bg-black flex flex-col justify-center'>
+      <div className="text-lg text-white">Player Turn : {playerTurn}</div>
       <Table/>  
     </div>
   );
