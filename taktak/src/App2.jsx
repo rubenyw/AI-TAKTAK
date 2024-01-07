@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-vars */
 import { useState } from 'react'
-import TaktakWithPlayer5x5 from './TaktakWithPlayer5x5'
+import TaktakWithPlayer6x6 from './TaktakWithPlayer6x6'
 
 function App() {
   return (
     <div className="w-full h-full">
-      <TaktakWithPlayer5x5/>
+      <TaktakWithPlayer6x6/>
     </div>
   )
 }

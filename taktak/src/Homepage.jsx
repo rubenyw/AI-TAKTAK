@@ -7,6 +7,9 @@ const Homepage = () => {
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={()=>navigate("/player")}>
                 Multiplayer
             </button>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={()=>navigate("/player6")}>
+                Multiplayer 6 x 6
+            </button>
             <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onClick={()=>navigate("/bot")}>
              Vs Bot
             </button>
