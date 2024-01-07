@@ -218,7 +218,7 @@ const TaktakWithPlayer = () => {
         <div className="text-lg mb-4">Player 2</div>
         <div className="text-lg mb-4">Score</div>
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-24 h-24 bg-black"
+          <div className={`w-24 h-24 ${players[2].stonesClicked? "bg-slate-400" : "bg-black"} hover:bg-slate-400`}
             onClick={()=>{PlayerClickStonesDeck(2, "stone")}}
           >
 
@@ -233,6 +233,28 @@ const TaktakWithPlayer = () => {
           </div>
           <div className="text-md">Stone : {players[2].capstones}</div>
         </div>
+        {
+          players[2].stonesClicked && (
+          <div className="flex flex-col gap-3 items-center">
+            <button 
+              onClick={() => setStoneMode(true)} 
+              className="w-full bg-blue-500 hover:bg-blue-700 focus:outline-none focus:ring focus:border-blue-300 text-white font-bold py-2 px-4 rounded"
+            >
+              Stand
+            </button>
+
+            <button 
+              onClick={() => setStoneMode(false)} 
+              className="w-full bg-green-500 hover:bg-green-700 focus:outline-none focus:ring focus:border-green-300 text-white font-bold py-2 px-4 rounded"
+            >
+              Flat
+            </button>
+            <div className="text-lg">
+              {!stoneMode? "Flat" : "Stand"}
+            </div>
+          </div>
+        )
+      }
       </div>
     )
   }
