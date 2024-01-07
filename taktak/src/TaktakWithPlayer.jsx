@@ -19,13 +19,15 @@ const TaktakWithPlayer = () => {
   const [lastPickUpPosition, setLastPickUpPosition] = useState(null);
   const [pickUpDirection, setPickUpDirection] = useState(null);
 
+  const [stoneMode, setStoneMode] = useState(false); // false = flat, true = standing
+
   const reset = () => {
     setBoard(() => Array.from({ length: 5 }, () => Array(5).fill(null)));
     setPlayerTurn(1);
     setPlayers(
       {
-        1: { stones: 21, capstones: 1 },
-        2: { stones: 21, capstones: 1 },
+        1: { stones: 21, capstones: 1, stonesClicked: false, capstoneClicked: false },
+        2: { stones: 21, capstones: 1, stonesClicked: false, capstoneClicked: false },
       }
     );
     setActionMode(false);
@@ -39,7 +41,7 @@ const TaktakWithPlayer = () => {
     if (!board[rowIndex][colIndex]) {
       setBoard((prevBoard) => {
         const newBoard = prevBoard.map((row) => [...row]);
-        newBoard[rowIndex][colIndex] = { player: playerTurn, type: "standing" };
+        newBoard[rowIndex][colIndex] = { player: playerTurn, type: stoneMode? "standing" : "flatstone" };
         setPlayerTurn(playerTurn === 1 ? 2 : 1);
         return newBoard;
       });
@@ -110,10 +112,10 @@ const TaktakWithPlayer = () => {
           ...prevPlayers,
           [turn]: {
             ...prevPlayers[turn],
-            stones: prevPlayers[turn].stonesClicked
-              ? prevPlayers[turn].stones + 1
-              : prevPlayers[turn].stones - 1,
+            stones: prevPlayers[turn].stonesClicked? prevPlayers[turn].stones + 1 : prevPlayers[turn].stones - 1,
             stonesClicked: !prevPlayers[turn].stonesClicked,
+            capstones: prevPlayers[turn].capstoneClicked? prevPlayers[turn].capstones + 1 : prevPlayers[turn].capstones,
+            capstoneClicked: prevPlayers[turn].capstoneClicked? !prevPlayers[turn].capstoneClicked : prevPlayers[turn].capstoneClicked,
           },
         };
         return updatedPlayers;
@@ -122,10 +124,10 @@ const TaktakWithPlayer = () => {
           ...prevPlayers,
           [turn]: {
             ...prevPlayers[turn],
-            capstones: prevPlayers[turn].capstoneClicked
-              ? prevPlayers[turn].capstones + 1
-              : prevPlayers[turn].capstones - 1,
+            capstones: prevPlayers[turn].capstoneClicked? prevPlayers[turn].capstones + 1 : prevPlayers[turn].capstones - 1,
             capstoneClicked: !prevPlayers[turn].capstoneClicked,
+            stones: prevPlayers[turn].stonesClicked? prevPlayers[turn].stones + 1 : prevPlayers[turn].stones,
+            stonesClicked: prevPlayers[turn].stonesClicked? !prevPlayers[turn].stonesClicked : prevPlayers[turn].stonesClicked,
           },
         };
         return updatedPlayers;
@@ -141,7 +143,7 @@ const TaktakWithPlayer = () => {
         <div className="text-lg mb-4">Player 1</div>
         <div className="text-lg mb-4">Score</div>
           <div className="flex items-center gap-4 mb-4">
-            <div className={`w-24 h-24 ${players[1].stonesClicked? "bg-slate-200" : "bg-white"} hover:bg-slate-200`}
+            <div className={`w-24 h-24 ${players[1].stonesClicked? "bg-slate-400" : "bg-white"} hover:bg-slate-400`}
               onClick={()=>{PlayerClickStonesDeck(playerTurn, "stone")}}
             >
 
@@ -149,13 +151,35 @@ const TaktakWithPlayer = () => {
             <div className="text-md">Stone : {players[1].stones}</div>
           </div>
         <div className="flex items-center gap-4 mb-4">
-          <div className={`w-24 h-24 ${players[1].capstoneClicked? "bg-slate-200" : "bg-white"} rounded-full`}
+          <div className={`w-24 h-24 ${players[1].capstoneClicked? "bg-slate-400" : "bg-white"} hover:bg-slate-400 rounded-full`}
             onClick={()=>{PlayerClickStonesDeck(playerTurn, "cap")}}
           >
 
           </div>
           <div className="text-md">Stone : {players[1].capstones}</div>
         </div>
+        {
+          players[1].stonesClicked && (
+          <div className="flex flex-col gap-3 items-center">
+            <button 
+              onClick={() => setStoneMode(true)} 
+              className="w-full bg-blue-500 hover:bg-blue-700 focus:outline-none focus:ring focus:border-blue-300 text-white font-bold py-2 px-4 rounded"
+            >
+              Stand
+            </button>
+
+            <button 
+              onClick={() => setStoneMode(false)} 
+              className="w-full bg-green-500 hover:bg-green-700 focus:outline-none focus:ring focus:border-green-300 text-white font-bold py-2 px-4 rounded"
+            >
+              Flat
+            </button>
+            <div className="text-lg">
+              {!stoneMode? "Flat" : "Stand"}
+            </div>
+          </div>
+        )
+      }
       </div>
     )
   }
