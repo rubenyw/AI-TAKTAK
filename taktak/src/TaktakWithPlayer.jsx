@@ -163,6 +163,78 @@ const TaktakWithPlayer = () => {
     setStoneMode(false);
     setPlayerTurn(playerTurn === 1 ? 2 : 1);
   }
+
+  const checkWin = () => {
+    // Check for both players
+    for (let player = 1; player <= 2; player++) {
+      // Check for a connecting path from the top to bottom and from left to right
+      if (hasConnectingPath(player, "vertical") || hasConnectingPath(player, "horizontal")) {
+        return `Player ${player} wins!`;
+      }
+    }
+    return "No winner yet.";
+  };
+  
+  const hasConnectingPath = (player, direction) => {
+    let visited = new Set(); // Keep track of visited cells
+    let queue = []; // Queue for BFS
+  
+    // Initialize the queue based on the direction of the search
+    if (direction === "vertical") {
+      for (let x = 0; x < board.length; x++) {
+        if (isPlayerStone(x, 0, player)) {
+          queue.push({ row: x, col: 0 });
+          visited.add(`${x},0`);
+        }
+      }
+    } else {
+      // 'horizontal'
+      for (let y = 0; y < board.length; y++) {
+        if (isPlayerStone(0, y, player)) {
+          queue.push({ row: 0, col: y });
+          visited.add(`0,${y}`);
+        }
+      }
+    }
+  
+    // BFS to find a path
+    while (queue.length > 0) {
+      let { row, col } = queue.shift();
+  
+      // Check if we've reached the opposite side
+      if (
+        (direction === "vertical" && col === board.length - 1) ||
+        (direction === "horizontal" && row === board.length - 1)
+      ) {
+        return true;
+      }
+  
+      // Check all four adjacent cells
+      [
+        { row, col: col - 1 },
+        { row, col: col + 1 },
+        { row: row - 1, col },
+        { row: row + 1, col },
+      ].forEach(({ row: nx, col: ny }) => {
+        if (isPlayerStone(nx, ny, player) && !visited.has(`${nx},${ny}`)) {
+          queue.push({ row: nx, col: ny });
+          visited.add(`${nx},${ny}`);
+        }
+      });
+    }
+  
+    return false; // No connecting path found
+  };
+
+  const isPlayerStone = (row, col, player) => {
+    // Check if the specified cell contains a stone (flat or capstone) of the given player
+    return (
+      board[row][col] &&
+      board[row][col].length > 0 &&
+      board[row][col][board[row][col].length - 1].player === player &&
+      !board[row][col][board[row][col].length - 1].isStanding()
+    );
+  };
   
 
   const PlayerClickStonesDeck = (turn, type) => {
