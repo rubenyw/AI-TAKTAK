@@ -13,6 +13,8 @@ const TaktakWithPlayer = () => {
     2: { stones: 21, capstones: 1, stonesClicked: false, capstoneClicked: false },
   })
 
+  const [previewMode, setPreviewMode] = useState(false);
+  const [previewBoard, setPreviewBoard] = useState([]);
   const [actionMode, setActionMode] = useState(false);
   const [hand, setHand] = useState([]);
   const [pickUpMode, setPickUpMode] = useState(false);
@@ -35,32 +37,33 @@ const TaktakWithPlayer = () => {
     setPickUpMode(false);
     setLastPickUpPosition(null);
     setPickUpDirection(null);
+    setPreviewMode([]);
   }
 
   const handleClick = (rowIndex, colIndex) => {
-    if (!board[rowIndex][colIndex]) {
-      if(!players[playerTurn].capstoneClicked && !players[playerTurn].stonesClicked){
-        console.log();
-      }else{
-        const stoneType = players[playerTurn].capstoneClicked? "capstone" : (stoneMode? "standing" : "flatstone");
-        placeStone(rowIndex, colIndex, stoneType);
-        nextTurn();
+    const currentPlayer = players[playerTurn];
+    if(previewMode){
+      setPreviewBoard(board[rowIndex][colIndex]?board[rowIndex][colIndex] :[]);
+    }
+    else if(!currentPlayer.capstoneClicked && !currentPlayer.stonesClicked){
+      setPreviewMode(board[rowIndex][colIndex]? board[rowIndex][colIndex]: []);
+    }else{
+      const stoneType = players[playerTurn].capstoneClicked? "capstone" : (stoneMode? "standing" : "flatstone");
+      placeStone(rowIndex, colIndex, stoneType);
+      nextTurn();
 
-      }
     }
   }
 
   const placeStone = (row, col, stone) => {
-    setBoard((prevBoard) => {
-      const newBoard = prevBoard.map((row) => [...row]);
-      if(!newBoard[row][col]){
-        newBoard[row][col] = [{ player: playerTurn, type: stone }];
-      }else{
-        newBoard[row][col].push({ player: playerTurn, type: stone });
-      }
-      console.log(newBoard[row][col]);
-      return newBoard;
-    });
+    let temp = board;
+    if(temp[row][col] == null){
+      temp[row][col] = [{ player: playerTurn, type: stone }];
+    }else{
+      temp[row][col].push({ player: playerTurn, type: stone });
+    }
+    console.log(temp[row][col]);
+    setBoard(temp);
   }
 
   const nextTurn = () => {
@@ -77,12 +80,13 @@ const TaktakWithPlayer = () => {
       return updatedPlayers;
     });
 
+    setStoneMode(false);
     setPlayerTurn(playerTurn === 1 ? 2 : 1);
   }
   
 
   const PlayerClickStonesDeck = (turn, type) => {
-    if (playerTurn !== turn) {
+    if (playerTurn !== turn || previewMode) {
       return;
     }
     
@@ -291,10 +295,49 @@ const TaktakWithPlayer = () => {
     return <div className={`${playerTurn == 1? "bg-white" : "bg-black"} h-8 w-8 rounded-full`}></div>
   }
 
+  const FlatstonePreview = ({playerTurn}) => {
+    return (
+      <div className={`${playerTurn == 1? "bg-white" : "bg-black border"} h-4 w-16`}></div>
+    )
+  }
+
+  const StandstonePreview = ({playerTurn})=> {
+    return (
+      <div className={`${playerTurn == 1? "bg-white" : "bg-black border"} h-8 w-4`}></div>
+    )
+  }
+  const CapstonePreview = ({playerTurn})=> {
+    return <div className={`${playerTurn == 1? "bg-white" : "bg-black border"} h-8 w-8 rounded-full`}></div>
+  }
+
   return (
     <div className='w-full h-full bg-black flex flex-col justify-center'>
       <div className="text-lg text-white self-center">
+        <div className="flex flex-col-reverse items-center">
+          {
+            previewMode &&
+            previewBoard.map((item, index)=> {
+              return (
+                <div key={index} className="flex">
+                  {
+                    item.type == "flatstone" &&
+                    <FlatstonePreview playerTurn={item.player}/>
+                  }
+                  {
+                    item.type == "standing" &&
+                    <StandstonePreview playerTurn={item.player}/>
+                  }
+                  {
+                    item.type == "capstone" &&
+                    <CapstonePreview playerTurn={item.player}/>
+                  }
+                </div>
+              )
+            })
+          }
+        </div>
         <button onClick={reset}>reset</button>
+        <button onClick={()=>{setPreviewMode(!previewMode)}}>Preview</button>
       </div>
       <div className="text-lg text-white">Player Turn : {playerTurn}</div>
       <Table/>  
