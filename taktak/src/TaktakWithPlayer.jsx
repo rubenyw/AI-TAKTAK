@@ -137,8 +137,9 @@ const TaktakWithPlayer = () => {
 
   const PlayerOneDeck = ()=> {
     return (
-      <div className="flex flex-col border basis-1/3 bg-gradient-to-r from-zinc-900 via-neutral-800 to-stone-700  text-white px-4">
+      <div className="flex flex-col border basis-1/3 rounded-lg bg-gradient-to-r from-zinc-900 via-neutral-800 to-stone-700  text-white px-4">
         <div className="text-lg mb-4">Player 1</div>
+        <div className="text-lg mb-4">Score</div>
           <div className="flex items-center gap-4 mb-4">
             <div className={`w-24 h-24 ${players[1].stonesClicked? "bg-slate-200" : "bg-white"} hover:bg-slate-200`}
               onClick={()=>{PlayerClickStonesDeck(playerTurn, "stone")}}
@@ -161,8 +162,9 @@ const TaktakWithPlayer = () => {
 
   const PlayerTwoDeck = ()=> {
     return (
-      <div className="flex flex-col border basis-1/3 bg-gradient-to-r from-zinc-400 via-neutral-500 to-stone-600 text-black px-4">
+      <div className="flex flex-col border basis-1/3 rounded-lg bg-gradient-to-r from-zinc-400 via-neutral-500 to-stone-600 text-black px-4">
         <div className="text-lg mb-4">Player 2</div>
+        <div className="text-lg mb-4">Score</div>
         <div className="flex items-center gap-4 mb-4">
           <div className="w-24 h-24 bg-black">
 
