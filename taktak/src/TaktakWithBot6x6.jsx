@@ -143,7 +143,7 @@ const TaktakWithPlayer = () => {
       console.log("Not in pick up mode or no stones in hand.");
     }
   };
-  
+
   const nextTurn = () => {
 
     setPlayers((prevPlayers) => {
