@@ -459,35 +459,54 @@ const TaktakWithPlayer = () => {
         });
     };
 
+    const renderStoneRecursive = (stone) => {
+        return stone.map((stone, index) => {
+            <Stone key={index} player={stone.player} type={stone.type}>
+                {stone.children && this.renderStoneRecursive(stone.children)}
+            </Stone>
+        })
+    }
+
     const PrintBoard = () => {
         const renderStones = (stones, playerTurn) => {
-            if (!stones.length) return null; // Base case: no more stones
-
-            const item = stones[0]; // Take the first stone
-            const type = item.type;
-            const width = `w-${16 - (stones.length - 1) * 2}`; // Adjust width based on depth
-
-            // Choose the component based on the type
-            const StoneComponent = type === "flatstone" ? Flatstone : type === "standing" ? Standstone : Capstone;
-
-            // Recursively nest stones
-            return (
-                <StoneComponent width={width} playerTurn={playerTurn}>
-                    {renderStones(stones.slice(1), playerTurn)}
-                </StoneComponent>
-            );
+          if (!stones.length) return null; // Base case: no more stones
+      
+          const item = stones[0]; // Take the first stone
+          const type = item.type;
+          console.log(stones.length);
+          const width = `h-${16 - (stones.length - 1) * 2}`; // Adjust width based on depth
+      
+          // Choose the component based on the type
+          const StoneComponent =
+            type === "flatstone" ? Flatstone : type === "standing" ? Standstone : Capstone;
+      
+          // Recursively nest stones
+        //   alert()
+          return (
+            <StoneComponent width={width} playerTurn={stones[0].player}>
+              {renderStones(stones.slice(1), stones[0].player)}
+            </StoneComponent>
+          );
         };
-
+      
         return board.map((row, rowIndex) => (
-            <div key={rowIndex} className="flex text-white">
-                {row.map((square, colIndex) => (
-                    <div key={colIndex} className="grid place-content-center bg-yellow-700 hover:bg-yellow-200 border h-24 w-24" onClick={() => handleClick(rowIndex, colIndex)}>
-                        {square && renderStones(square, square[0]?.player)}
+          <div key={rowIndex} className="flex text-white">
+            {row.map((square, colIndex) => {
+                console.log(square);
+                console.log(square? square.reverse(): "null");
+                return (
+                    <div
+                      key={colIndex}
+                      className="grid place-content-center bg-yellow-700 hover:bg-yellow-200 border h-24 w-24"
+                      onClick={() => handleClick(rowIndex, colIndex)}
+                    >
+                      {square && renderStones(square.slice().reverse(), square?.slice().reverse()[0].player)}
                     </div>
-                ))}
-            </div>
+                  )
+            })}
+          </div>
         ));
-    };
+      };      
 
     const LeftsideNumber = () => {
         return (
@@ -623,13 +642,14 @@ const TaktakWithPlayer = () => {
         );
     };
 
-    const Flatstone = ({ playerTurn }) => {
-        return <div className={`${playerTurn == 1 ? "bg-white" : "bg-black"} h-16 w-16`}></div>;
+    const Flatstone = ({ playerTurn, width }) => {
+        return <div className={`${playerTurn == 1 ? "bg-white" : "bg-black"} w-16 ${width}`}></div>;
     };
 
     const Standstone = ({ playerTurn }) => {
         return <div className={`${playerTurn == 1 ? "bg-white" : "bg-black"} h-16 w-8`}></div>;
     };
+
     const Capstone = ({ playerTurn }) => {
         return <div className={`${playerTurn == 1 ? "bg-white" : "bg-black"} h-8 w-8 rounded-full`}></div>;
     };
@@ -641,6 +661,7 @@ const TaktakWithPlayer = () => {
     const StandstonePreview = ({ playerTurn }) => {
         return <div className={`${playerTurn == 1 ? "bg-white" : "bg-black border"} h-8 w-4`}></div>;
     };
+
     const CapstonePreview = ({ playerTurn }) => {
         return <div className={`${playerTurn == 1 ? "bg-white" : "bg-black border"} h-8 w-8 rounded-full`}></div>;
     };
