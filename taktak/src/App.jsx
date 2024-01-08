@@ -1,13 +1,13 @@
 /* eslint-disable no-unused-vars */
-import { useState } from 'react'
-import TaktakWithPlayer5x5 from './TaktakWithPlayer5x5'
+import { useState } from "react";
+import TaktakWithBot6x6 from "./TaktakWithBot6x6";
 
 function App() {
-  return (
-    <div className="w-full h-full">
-      <TaktakWithPlayer5x5/>
-    </div>
-  )
+    return (
+        <div className="w-full h-full">
+            <TaktakWithBot6x6 />
+        </div>
+    );
 }
 
-export default App
+export default App;
