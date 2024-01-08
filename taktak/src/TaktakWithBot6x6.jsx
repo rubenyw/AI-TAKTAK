@@ -177,7 +177,7 @@ const TaktakWithPlayer = () => {
 
                 // Check if player 2 exists in the 'updatedPlayers' object
                 // Reduce the 'stones' count by 1 for player 2
-                updatedPlayers[2].capstones -= 1;
+                updatedPlayers[2].capstone -= 1;
 
                 // Update the state with the modified 'updatedPlayers' object
                 setPlayers(updatedPlayers);
@@ -460,23 +460,31 @@ const TaktakWithPlayer = () => {
     };
 
     const PrintBoard = () => {
+        const renderStones = (stones, playerTurn) => {
+            if (!stones.length) return null; // Base case: no more stones
+
+            const item = stones[0]; // Take the first stone
+            const type = item.type;
+            const width = `w-${16 - (stones.length - 1) * 2}`; // Adjust width based on depth
+
+            // Choose the component based on the type
+            const StoneComponent = type === "flatstone" ? Flatstone : type === "standing" ? Standstone : Capstone;
+
+            // Recursively nest stones
+            return (
+                <StoneComponent width={width} playerTurn={playerTurn}>
+                    {renderStones(stones.slice(1), playerTurn)}
+                </StoneComponent>
+            );
+        };
+
         return board.map((row, rowIndex) => (
             <div key={rowIndex} className="flex text-white">
-                {row.map((square, colIndex) => {
-                    return (
-                        <div
-                            key={colIndex}
-                            className="grid place-content-center bg-yellow-700 hover:bg-yellow-200 border h-24 w-24"
-                            onClick={() => {
-                                handleClick(rowIndex, colIndex);
-                            }}
-                        >
-                            {square && square[square.length - 1].type == "flatstone" && <Flatstone playerTurn={square[square.length - 1].player} />}
-                            {square && square[square.length - 1].type == "standing" && <Standstone playerTurn={square[square.length - 1].player} />}
-                            {square && square[square.length - 1].type == "capstone" && <Capstone playerTurn={square[square.length - 1].player} />}
-                        </div>
-                    );
-                })}
+                {row.map((square, colIndex) => (
+                    <div key={colIndex} className="grid place-content-center bg-yellow-700 hover:bg-yellow-200 border h-24 w-24" onClick={() => handleClick(rowIndex, colIndex)}>
+                        {square && renderStones(square, square[0]?.player)}
+                    </div>
+                ))}
             </div>
         ));
     };
