@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 const Homepage = () => {
     const navigate = useNavigate();
     const [modalIsOpen, setModalIsOpen] = useState(false);
-    const [strings, setStrings] = useState(['String 1', 'String 2', 'String 3']);
+    const [strings, setStrings] = useState(['Ruben Yason W', 'Steven H', 'Vincent S']);
 
     const openModal = () => {
         setModalIsOpen(true);
@@ -17,7 +17,7 @@ const Homepage = () => {
 
     return (
         <div className="grid place-content-center gap-5 h-full w-full bg-black text-white">
-            
+            <h1>TAK-TAK-5</h1>
 <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={()=>navigate("/player")}>
                 Multiplayer
             </button>
@@ -33,14 +33,15 @@ const Homepage = () => {
                 Open Modal
             </button>
             <Modal isOpen={modalIsOpen} onRequestClose={closeModal} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-8 rounded-md shadow-lg">
-                <h2 className="text-xl font-bold mb-4">Strings in Modal</h2>
+                <h2 className="text-xl font-bold mb-4">Made By : </h2>
                 <ul className="list-disc ml-6">
+                    <h3></h3>
                     {strings.map((str, index) => (
                         <li key={index}>{str}</li>
                     ))}
                 </ul>
                 <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4" onClick={closeModal}>
-                    Close Modal
+                    About
                 </button>
             </Modal>
         </div>
