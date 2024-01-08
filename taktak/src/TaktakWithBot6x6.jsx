@@ -28,11 +28,11 @@ const TaktakWithPlayer = () => {
     const [stoneMode, setStoneMode] = useState(false); // false = flat, true = standing
 
     const reset = () => {
-        setBoard(() => Array.from({ length: 5 }, () => Array(5).fill(null)));
+        setBoard(() => Array.from({ length: 6 }, () => Array(6).fill(null)));
         setPlayerTurn(1);
         setPlayers({
-            1: { stones: 21, capstones: 1, stonesClicked: false, capstoneClicked: false },
-            2: { stones: 21, capstones: 1, stonesClicked: false, capstoneClicked: false },
+            1: { stones: 30, capstones: 1, stonesClicked: false, capstoneClicked: false },
+            2: { stones: 30, capstones: 1, stonesClicked: false, capstoneClicked: false },
         });
         setActionMode(false);
         setHand([]);
@@ -162,6 +162,27 @@ const TaktakWithPlayer = () => {
             temp[row][col].push({ player: playerTurn, type: stone });
         }
         console.log(temp[row][col]);
+        if (playerTurn == 2) {
+            if (stone == "flatstone" || stone == "standing") {
+                const updatedPlayers = { ...players }; // Create a copy of the 'players' object
+
+                // Check if player 2 exists in the 'updatedPlayers' object
+                // Reduce the 'stones' count by 1 for player 2
+                updatedPlayers[2].stones -= 1;
+
+                // Update the state with the modified 'updatedPlayers' object
+                setPlayers(updatedPlayers);
+            } else if (stone == "capstone") {
+                const updatedPlayers = { ...players }; // Create a copy of the 'players' object
+
+                // Check if player 2 exists in the 'updatedPlayers' object
+                // Reduce the 'stones' count by 1 for player 2
+                updatedPlayers[2].capstones -= 1;
+
+                // Update the state with the modified 'updatedPlayers' object
+                setPlayers(updatedPlayers);
+            }
+        }
         setBoard(temp);
     };
 
